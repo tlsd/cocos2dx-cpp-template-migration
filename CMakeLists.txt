@@ -125,6 +125,8 @@ target_link_libraries(${APP_NAME} cocos2d)
 target_include_directories(${APP_NAME}
         PRIVATE Classes
         PRIVATE ${COCOS2DX_ROOT_PATH}/cocos/audio/include/
+        PRIVATE ${COCOS2DX_ROOT_PATH}/cocos/audio/include/
+        PRIVATE ${COCOS2DX_ROOT_PATH}/cocos/editor-support/cocostudio
 )
 
 # mark app resources
