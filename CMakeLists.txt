@@ -46,17 +46,43 @@ if(APPLE OR WINDOWS)
     cocos_mark_multi_resources(common_res_files RES_TO "Resources" FOLDERS ${GAME_RES_FOLDER})
 endif()
 
+
 # add cross-platforms source files and header files 
-list(APPEND GAME_SOURCE
-     Classes/AppDelegate.cpp
-     Classes/HelloWorldScene.cpp
-     )
-list(APPEND GAME_HEADER
-     Classes/AppDelegate.h
-     Classes/HelloWorldScene.h
-     )
+# get source files recursive
+file(GLOB_RECURSE GAME_SOURCE Classes/*.cpp)
+
+list(LENGTH GAME_SOURCE GAME_SOURCE_count)
+message(STATUS "[INFO] Found ${GAME_SOURCE_count} cpp files.")
+
+# get header files recursive
+file(GLOB_RECURSE GAME_HEADER Classes/*.h Classes/*.hpp)
+
+list(LENGTH GAME_HEADER GAME_HEADER_count)
+message(STATUS "[INFO] Found ${GAME_HEADER_count} header files.")
+
+# get headr dir
+MACRO(HEADER_DIRECTORIES return_list)
+    FILE(GLOB_RECURSE new_list Classes/*.h Classes/*.hpp)
+    SET(dir_list "")
+    FOREACH(file_path ${new_list})
+        GET_FILENAME_COMPONENT(dir_path ${file_path} PATH)
+        SET(dir_list ${dir_list} ${dir_path})
+    ENDFOREACH()
+    LIST(REMOVE_DUPLICATES dir_list)
+    SET(${return_list} ${dir_list})
+ENDMACRO()
+
+HEADER_DIRECTORIES(header_dir_list)
+
+list(LENGTH header_dir_list header_dir_list_count)
+message(STATUS "[INFO] Found ${header_dir_list_count} header directories.")
+
 
 if(ANDROID)
+    # file to remove
+    # get_filename_component(full_path_test_cpp ${CMAKE_CURRENT_SOURCE_DIR}/Classes/test.cpp ABSOLUTE)
+    # list(REMOVE_ITEM GAME_SOURCE "${full_path_test_cpp}")
+
     # change APP_NAME to the share library name for Android, it's value depend on AndroidManifest.xml
     set(APP_NAME MyGame)
     list(APPEND GAME_SOURCE
@@ -125,8 +151,8 @@ target_link_libraries(${APP_NAME} cocos2d)
 target_include_directories(${APP_NAME}
         PRIVATE Classes
         PRIVATE ${COCOS2DX_ROOT_PATH}/cocos/audio/include/
-        PRIVATE ${COCOS2DX_ROOT_PATH}/cocos/audio/include/
         PRIVATE ${COCOS2DX_ROOT_PATH}/cocos/editor-support/cocostudio
+        PRIVATE ${header_dir_list}
 )
 
 # mark app resources
